@@ -67,7 +67,7 @@ export default function Home() {
             <div className="border mt-6 rounded-xl p-4 bg-white/70">
               <pre className="whitespace-pre-wrap text-sm">{JSON.stringify(result, null, 2)}</pre>
               <p className={`mt-4 font-medium ${result.responsible_use ? "text-green-600" : "text-red-600"}`}>
-                {result.responsible_use ? "✅ Responsible Use Confirmed" : "⚠️ Possible Over‑Reliance Detected"}
+                {result.responsible_use ? "✅ Responsible Use Confirmed" : "⚠️ Possible Over-Reliance Detected"}
               </p>
             </div>
           )}
