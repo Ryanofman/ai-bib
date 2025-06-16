@@ -1,4 +1,3 @@
-```js
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -10,5 +9,3 @@ module.exports = {
   },
   plugins: [],
 };
-```
-
