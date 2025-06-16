@@ -1,4 +1,3 @@
-ts
 import { NextResponse } from "next/server";
 import { cosineSimilarity } from "@/lib/similarity";
 
