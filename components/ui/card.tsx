@@ -1,4 +1,3 @@
-```tsx
 import * as React from "react";
 import { cn } from "../utils";
 
@@ -11,6 +10,5 @@ export const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes
   <div ref={ref} className={cn("p-6", className)} {...props} />
 ));
 CardContent.displayName = "CardContent";
-```
 
 
