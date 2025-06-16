@@ -1,5 +1,3 @@
-```ts
-// trivial cosine similarity using bag‑of‑words counts – replace with embeddings later
 export function cosineSimilarity(a: string, b: string): number {
   const tokensA = tokenCounts(a);
   const tokensB = tokenCounts(b);
@@ -23,6 +21,6 @@ function tokenCounts(s: string) {
     .filter(Boolean)
     .reduce<Record<string, number>>((acc, t) => ((acc[t] = (acc[t] || 0) + 1), acc), {});
 }
-```
+
 
 
