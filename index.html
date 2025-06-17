@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Bib Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            background-color: #0a0a0a;
+            color: #e3e3e3;
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.25rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            color: #fff;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .logo:hover {
+            opacity: 0.8;
+        }
+
+        .nav {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nav a {
+            color: #b4b4b4;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+            font-weight: 400;
+        }
+
+        .nav a:hover {
+            color: #fff;
+        }
+
+        .nav-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 0.5rem 1.25rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            font-weight: 400;
+        }
+
+        .nav-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Main Container */
+        .main-container {
+            padding-top: 80px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem 3rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, #fff 20%, #999 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: #999;
+            line-height: 1.7;
+            font-weight: 300;
+        }
+
+        /* Central Interface */
+        .central-interface {
+            width: 100%;
+            max-width: 750px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem;
+        }
+
+        /* Upload Box */
+        .upload-box {
+            background: #141414;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area {
+            background: #0a0a0a;
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            background: #0f0f0f;
+        }
+
+        .upload-area.drag-over {
+            border-color: #4a9eff;
+            background: rgba(74, 158, 255, 0.05);
+        }
+
+        .upload-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 1rem;
+            opacity: 0.6;
+        }
+
+        .upload-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.5;
+        }
+
+        .upload-text {
+            font-size: 1rem;
+            color: #999;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #fff;
+            padding: 0.625rem 1.5rem;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 1rem;
+            font-weight: 400;
+        }
+
+        .upload-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        /* File List */
+        .file-list {
+            margin-top: 1.5rem;
+            space-y: 0.5rem;
+        }
+
+        .file-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.2s;
+        }
+
+        .file-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .file-icon {
+            width: 20px;
+            height: 20px;
+            opacity: 0.6;
+        }
+
+        .file-name {
+            font-size: 0.95rem;
+            color: #e3e3e3;
+        }
+
+        .remove-file {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            padding: 0.25rem;
+            transition: color 0.2s;
+            font-size: 1.25rem;
+            line-height: 1;
+        }
+
+        .remove-file:hover {
+            color: #ff4444;
+        }
+
+        /* Generate Button */
+        .generate-section {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .generate-button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 0.875rem 2.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .generate-button:hover:not(:disabled) {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        }
+
+        .generate-button:disabled {
+            background: #1e1e1e;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        /* Loading State */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #2563eb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #999;
+            font-size: 1rem;
+        }
+
+        /* Output Section */
+        .output-section {
+            background: #141414;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .output-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+        }
+
+        .format-selector {
+            display: flex;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            padding: 0.25rem;
+        }
+
+        .format-button {
+            background: none;
+            border: none;
+            color: #999;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+            font-weight: 400;
+        }
+
+        .format-button.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .format-button:hover:not(.active) {
+            color: #ccc;
+        }
+
+        /* Bibliography Content */
+        .bibliography-content {
+            background: #0a0a0a;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 2rem;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            line-height: 2;
+            color: #e3e3e3;
+        }
+
+        .citation-entry {
+            margin-bottom: 1.5rem;
+            padding-left: 2rem;
+            text-indent: -2rem;
+            font-size: 0.95rem;
+        }
+
+        .citation-entry em {
+            font-style: italic;
+            color: #ccc;
+        }
+
+        /* Action Buttons */
+        .output-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .action-button {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+            font-weight: 400;
+        }
+
+        .action-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .action-button.primary {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+
+        .action-button.primary:hover {
+            background: #1d4ed8;
+            border-color: #1d4ed8;
+        }
+
+        /* Features Grid */
+        .features {
+            max-width: 1200px;
+            margin: 6rem auto 4rem;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: #141414;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 2.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1.5rem;
+            color: #2563eb;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.02em;
+        }
+
+        .feature-description {
+            color: #999;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: #666;
+            font-size: 0.875rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 6rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="#" class="logo">AI Bibliography Generator</a>
+            <nav class="nav">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How it works</a>
+                <a href="#about">About</a>
+                <a href="#" class="nav-button">Get Started</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <section class="hero">
+            <h1>Document AI Usage with Academic Integrity</h1>
+            <p>Generate professional bibliographies that transparently show how AI enhanced your research and writing process.</p>
+        </section>
+
+        <div class="central-interface">
+            <div class="upload-box">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                    </div>
+                    <p class="upload-text">Drop your AI conversation files here</p>
+                    <input type="file" id="fileInput" class="file-input" multiple accept=".txt,.json,.pdf,.docx,.csv">
+                    <button class="upload-button" onclick="document.getElementById('fileInput').click()">
+                        Choose Files
+                    </button>
+                </div>
+                <div class="file-list" id="fileList"></div>
+            </div>
+
+            <div class="generate-section">
+                <button class="generate-button" id="generateButton" disabled onclick="generateBibliography()">
+                    Generate Bibliography
+                </button>
+            </div>
+
+            <div class="output-section" id="outputSection">
+                <div class="output-header">
+                    <h2 class="output-title">Generated Bibliography</h2>
+                    <div class="format-selector">
+                        <button class="format-button active" onclick="changeFormat('apa')">APA</button>
+                        <button class="format-button" onclick="changeFormat('mla')">MLA</button>
+                        <button class="format-button" onclick="changeFormat('chicago')">Chicago</button>
+                    </div>
+                </div>
+                <div class="bibliography-content" id="bibliographyContent">
+                    <!-- Bibliography entries will be inserted here -->
+                </div>
+                <div class="output-actions">
+                    <button class="action-button primary" onclick="copyBibliography()">
+                        Copy to Clipboard
+                    </button>
+                    <button class="action-button" onclick="downloadBibliography()">
+                        Download
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="features" id="features">
+        <div class="feature-card">
+            <div class="feature-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M9 11H3v10h6V11zm5-7H8v17h6V4zm5 11h-6v6h6v-6z"/>
+                </svg>
+            </div>
+            <h3 class="feature-title">Comprehensive Analysis</h3>
+            <p class="feature-description">Our AI analyzes your conversations to identify exactly how AI contributed to your work, categorizing assistance by type and impact.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+            </div>
+            <h3 class="feature-title">Academic Standards</h3>
+            <p class="feature-description">Generate citations in APA, MLA, and Chicago formats that meet academic requirements for AI source documentation.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+            </div>
+            <h3 class="feature-title">Ethical Transparency</h3>
+            <p class="feature-description">Promote responsible AI use by clearly documenting how AI enhanced rather than replaced your original thinking and research.</p>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>&copy; 2024 AI Bibliography Generator. Built for academic integrity.</p>
+    </footer>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p class="loading-text">Analyzing your conversations...</p>
+        </div>
+    </div>
+
+    <script>
+        let uploadedFiles = [];
+        let currentFormat = 'apa';
+
+        // Drag and drop functionality
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        const generateButton = document.getElementById('generateButton');
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            for (let file of files) {
+                if (!uploadedFiles.find(f => f.name === file.name)) {
+                    uploadedFiles.push(file);
+                    displayFile(file);
+                }
+            }
+            updateGenerateButton();
+        }
+
+        function displayFile(file) {
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            fileItem.innerHTML = `
+                <div class="file-info">
+                    <svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    <span class="file-name">${file.name}</span>
+                </div>
+                <button class="remove-file" onclick="removeFile('${file.name}')">&times;</button>
+            `;
+            fileList.appendChild(fileItem);
+        }
+
+        function removeFile(fileName) {
+            uploadedFiles = uploadedFiles.filter(f => f.name !== fileName);
+            fileList.innerHTML = '';
+            uploadedFiles.forEach(file => displayFile(file));
+            updateGenerateButton();
+        }
+
+        function updateGenerateButton() {
+            generateButton.disabled = uploadedFiles.length === 0;
+        }
+
+        function generateBibliography() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            
+            // Simulate processing time
+            setTimeout(() => {
+                createBibliography();
+                document.getElementById('loadingOverlay').style.display = 'none';
+                document.getElementById('outputSection').style.display = 'block';
+                document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
+            }, 2500);
+        }
+
+        function createBibliography() {
+            const bibliographyContent = document.getElementById('bibliographyContent');
+            
+            // Sample bibliography entries
+            const entries = [
+                {
+                    type: 'Literature Review',
+                    model: 'GPT-4',
+                    provider: 'OpenAI',
+                    date: new Date().toLocaleDateString(),
+                    purpose: 'Identifying relevant academic sources and refining research questions',
+                    impact: 'Suggested 15 potential sources; 8 were incorporated after independent verification'
+                },
+                {
+                    type: 'Writing Enhancement',
+                    model: 'Claude 3 Opus',
+                    provider: 'Anthropic',
+                    date: new Date().toLocaleDateString(),
+                    purpose: 'Grammar checking and clarity improvements',
+                    impact: 'Improved sentence structure in introduction and conclusion; all content remained original'
+                },
+                {
+                    type: 'Conceptual Development',
+                    model: 'ChatGPT',
+                    provider: 'OpenAI',
+                    date: new Date().toLocaleDateString(),
+                    purpose: 'Brainstorming thesis statements and argument structure',
+                    impact: 'Generated 5 thesis options; final thesis independently developed based on AI suggestions'
+                }
+            ];
+
+            let html = '';
+            entries.forEach((entry, index) => {
+                html += formatEntry(entry, currentFormat);
+            });
+
+            bibliographyContent.innerHTML = html;
+        }
+
+        function formatEntry(entry, format) {
+            let citation = '';
+            
+            switch(format) {
+                case 'apa':
+                    citation = `<div class="citation-entry">
+                        ${entry.provider}. (${entry.date}). <em>${entry.model}: ${entry.type}</em> [Large language model]. Purpose: ${entry.purpose}. Impact: ${entry.impact}.
+                    </div>`;
+                    break;
+                case 'mla':
+                    citation = `<div class="citation-entry">
+                        "${entry.type}." <em>${entry.model}</em>, ${entry.provider}, ${entry.date}. Large Language Model. Purpose: ${entry.purpose}. Impact: ${entry.impact}.
+                    </div>`;
+                    break;
+                case 'chicago':
+                    citation = `<div class="citation-entry">
+                        ${entry.provider}. "${entry.type}." <em>${entry.model}</em>. Large Language Model. Accessed ${entry.date}. Purpose: ${entry.purpose}. Impact: ${entry.impact}.
+                    </div>`;
+                    break;
+            }
+            
+            return citation;
+        }
+
+        function changeFormat(format) {
+            currentFormat = format;
+            document.querySelectorAll('.format-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            createBibliography();
+        }
+
+        function copyBibliography() {
+            const content = document.getElementById('bibliographyContent').innerText;
+            navigator.clipboard.writeText(content).then(() => {
+                const button = event.target;
+                const originalText = button.innerText;
+                button.innerText = 'Copied!';
+                setTimeout(() => {
+                    button.innerText = originalText;
+                }, 2000);
+            });
+        }
+
+        function downloadBibliography() {
+            const content = document.getElementById('bibliographyContent').innerText;
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ai-bibliography-${currentFormat}.txt`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
