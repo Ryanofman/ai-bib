@@ -144,6 +144,9 @@
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .method-card {
@@ -752,6 +755,63 @@
             font-size: 0.95rem;
         }
 
+        /* Integrity Report Styles */
+        .integrity-report {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .integrity-score {
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .integrity-score.high { color: #22c55e; }
+        .integrity-score.medium { color: #f59e0b; }
+        .integrity-score.low { color: #ef4444; }
+        .integrity-score.very_low { color: #dc2626; }
+
+        .score-value {
+            font-size: 2.5rem;
+            font-weight: 600;
+            display: block;
+        }
+
+        .score-label {
+            font-size: 0.875rem;
+            opacity: 0.7;
+        }
+
+        .recommendation {
+            text-align: center;
+            margin: 1rem 0;
+            font-style: italic;
+            color: #999;
+        }
+
+        .issues-section, .warnings-section {
+            margin-top: 1rem;
+        }
+
+        .issues-section h4, .warnings-section h4 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: #e3e3e3;
+        }
+
+        .issue, .warning {
+            margin: 0.5rem 0;
+            padding-left: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .issue.high { color: #ef4444; }
+        .issue.medium { color: #f59e0b; }
+        .warning { color: #fbbf24; }
+
         /* Footer */
         .footer {
             text-align: center;
@@ -786,24 +846,24 @@
             <!-- Upload Methods Selection -->
             <div class="upload-methods">
                 <div class="method-card" onclick="selectMethod('paste')">
-                    <div class="method-badge">Recommended</div>
                     <div class="method-icon">
                         <svg viewBox="0 0 24 24">
                             <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                         </svg>
                     </div>
                     <h3 class="method-title">Smart Paste</h3>
-                    <p class="method-description">Copy your entire conversation and paste it here. We'll automatically detect the format and extract key information.</p>
+                    <p class="method-description">Copy your entire conversation and paste it here. We'll automatically detect the format and check for completeness.</p>
                 </div>
 
                 <div class="method-card" onclick="selectMethod('url')">
+                    <div class="method-badge">Recommended</div>
                     <div class="method-icon">
                         <svg viewBox="0 0 24 24">
                             <path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
                         </svg>
                     </div>
                     <h3 class="method-title">Share Link</h3>
-                    <p class="method-description">Paste a shared conversation link from ChatGPT, Claude, or other AI platforms.</p>
+                    <p class="method-description">Paste a shared conversation link from ChatGPT, Claude, or other AI platforms for the most accurate citations.</p>
                 </div>
 
                 <div class="method-card" onclick="selectMethod('file')">
@@ -979,11 +1039,13 @@ Assistant: I'd be happy to help improve your essay introduction..."
         </div>
     </div>
 
+    <script src="conversation-detector.js"></script>
     <script>
         let uploadedFiles = [];
         let currentFormat = 'apa';
         let selectedMethod = null;
         let conversationData = null;
+        const detector = new ConversationDetector();
 
         // Method selection
         function selectMethod(method) {
@@ -1030,47 +1092,69 @@ Assistant: I'd be happy to help improve your essay introduction..."
             
             detector.classList.add('active');
             
-            // Pattern detection
-            let detectedFormat = 'unknown';
-            if (text.includes('User:') && text.includes('Assistant:')) {
-                detectorText.textContent = 'Detected: ChatGPT conversation (95% confidence)';
-                detectedFormat = 'chatgpt';
-            } else if (text.includes('Human:') && text.includes('Assistant:')) {
-                detectorText.textContent = 'Detected: Claude conversation (98% confidence)';
-                detectedFormat = 'claude';
-            } else if (text.includes('You:') && (text.includes('ChatGPT:') || text.includes('GPT:'))) {
-                detectorText.textContent = 'Detected: ChatGPT export format';
-                detectedFormat = 'chatgpt-export';
-            } else if (text.includes('```') || text.includes('def ') || text.includes('function ')) {
-                detectorText.textContent = 'Detected: Code-heavy conversation';
-                detectedFormat = 'code-focused';
+            // Use the conversation detector for analysis
+            const analysis = window.detector.analyzeIntegrity(text);
+            
+            // Update detector text based on analysis
+            if (analysis.format !== 'unknown') {
+                const platformName = analysis.format.charAt(0).toUpperCase() + analysis.format.slice(1);
+                detectorText.textContent = `Detected: ${platformName} conversation (${analysis.score}% integrity)`;
+                
+                // Add warning color if integrity is low
+                if (analysis.integrityLevel === 'low' || analysis.integrityLevel === 'very_low') {
+                    detector.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                    detectorText.style.color = '#ef4444';
+                } else if (analysis.integrityLevel === 'medium') {
+                    detector.style.backgroundColor = 'rgba(245, 158, 11, 0.1)';
+                    detectorText.style.color = '#f59e0b';
+                } else {
+                    detector.style.backgroundColor = 'rgba(37, 99, 235, 0.1)';
+                    detectorText.style.color = '#2563eb';
+                }
             } else {
                 detectorText.textContent = 'Analyzing format...';
             }
 
-            // Quick stats
-            const lines = text.split('\n');
-            const messageCount = (text.match(/(User:|Human:|Assistant:|You:|ChatGPT:)/g) || []).length;
+            // Update stats
+            document.getElementById('messageCount').textContent = analysis.statistics.totalMessages || 0;
             const codeBlocks = (text.match(/```/g) || []).length / 2;
-            const editIndicators = (text.match(/(revised|updated|changed|modified|improved|edited|fixed)/gi) || []).length;
-            
-            document.getElementById('messageCount').textContent = messageCount;
             document.getElementById('codeBlocks').textContent = Math.floor(codeBlocks);
+            const editIndicators = (text.match(/(revised|updated|changed|modified|improved|edited|fixed)/gi) || []).length;
             document.getElementById('editCount').textContent = editIndicators;
             
-            if (messageCount > 0) {
-                preview.classList.add('active');
-                conversationData = {
-                    type: 'paste',
-                    format: detectedFormat,
-                    content: text,
-                    stats: {
-                        messages: messageCount,
-                        codeBlocks: Math.floor(codeBlocks),
-                        edits: editIndicators
-                    }
-                };
+            preview.classList.add('active');
+            
+            // Show integrity report if issues found
+            if (analysis.score < 90) {
+                const reportHtml = window.detector.generateReport(analysis);
+                const existingReport = document.getElementById('integrityReport');
+                
+                if (existingReport) {
+                    existingReport.innerHTML = reportHtml;
+                } else {
+                    const reportDiv = document.createElement('div');
+                    reportDiv.id = 'integrityReport';
+                    reportDiv.innerHTML = reportHtml;
+                    preview.appendChild(reportDiv);
+                }
+            } else {
+                const existingReport = document.getElementById('integrityReport');
+                if (existingReport) {
+                    existingReport.remove();
+                }
             }
+            
+            conversationData = {
+                type: 'paste',
+                format: analysis.format,
+                content: text,
+                analysis: analysis,
+                stats: {
+                    messages: analysis.statistics.totalMessages || 0,
+                    codeBlocks: Math.floor(codeBlocks),
+                    edits: editIndicators
+                }
+            };
             
             updateGenerateButton();
         }
@@ -1215,6 +1299,12 @@ Assistant: I'd be happy to help improve your essay introduction..."
             let entries = [];
             
             if (conversationData) {
+                // Add integrity notice if needed
+                let integrityNote = '';
+                if (conversationData.analysis && conversationData.analysis.score < 90) {
+                    integrityNote = ` [Note: Conversation may contain edits or omissions. Integrity score: ${conversationData.analysis.score}%]`;
+                }
+                
                 // Add entries based on detected usage patterns
                 if (conversationData.stats && conversationData.stats.codeBlocks > 0) {
                     entries.push({
@@ -1223,7 +1313,8 @@ Assistant: I'd be happy to help improve your essay introduction..."
                         provider: conversationData.format === 'claude' ? 'Anthropic' : 'OpenAI',
                         date: new Date().toLocaleDateString(),
                         purpose: 'Debugging and code optimization assistance',
-                        impact: `Provided ${conversationData.stats.codeBlocks} code examples; implementation adapted and tested independently`
+                        impact: `Provided ${conversationData.stats.codeBlocks} code examples; implementation adapted and tested independently`,
+                        integrityNote: integrityNote
                     });
                 }
                 
@@ -1234,7 +1325,8 @@ Assistant: I'd be happy to help improve your essay introduction..."
                         provider: conversationData.format === 'claude' ? 'Anthropic' : 'OpenAI',
                         date: new Date().toLocaleDateString(),
                         purpose: 'Grammar, clarity, and structure improvements',
-                        impact: `Suggested ${conversationData.stats.edits} revisions; final content reflects original ideas with enhanced clarity`
+                        impact: `Suggested ${conversationData.stats.edits} revisions; final content reflects original ideas with enhanced clarity`,
+                        integrityNote: integrityNote
                     });
                 }
             }
@@ -1248,7 +1340,8 @@ Assistant: I'd be happy to help improve your essay introduction..."
                         provider: 'OpenAI',
                         date: new Date().toLocaleDateString(),
                         purpose: 'Identifying relevant academic sources and refining research questions',
-                        impact: 'Suggested 15 potential sources; 8 were incorporated after independent verification'
+                        impact: 'Suggested 15 potential sources; 8 were incorporated after independent verification',
+                        integrityNote: ''
                     },
                     {
                         type: 'Conceptual Development',
@@ -1256,7 +1349,8 @@ Assistant: I'd be happy to help improve your essay introduction..."
                         provider: 'Anthropic',
                         date: new Date().toLocaleDateString(),
                         purpose: 'Brainstorming thesis statements and argument structure',
-                        impact: 'Generated 5 thesis options; final thesis independently developed based on AI suggestions'
+                        impact: 'Generated 5 thesis options; final thesis independently developed based on AI suggestions',
+                        integrityNote: ''
                     }
                 ];
             }
@@ -1271,21 +1365,22 @@ Assistant: I'd be happy to help improve your essay introduction..."
 
         function formatEntry(entry, format) {
             let citation = '';
+            const integrityNote = entry.integrityNote || '';
             
             switch(format) {
                 case 'apa':
                     citation = `<div class="citation-entry">
-                        ${entry.provider}. (${entry.date}). <em>${entry.model}: ${entry.type}</em> [Large language model]. Purpose: ${entry.purpose}. Impact: ${entry.impact}.
+                        ${entry.provider}. (${entry.date}). <em>${entry.model}: ${entry.type}</em> [Large language model]. Purpose: ${entry.purpose}. Impact: ${entry.impact}${integrityNote}.
                     </div>`;
                     break;
                 case 'mla':
                     citation = `<div class="citation-entry">
-                        "${entry.type}." <em>${entry.model}</em>, ${entry.provider}, ${entry.date}. Large Language Model. Purpose: ${entry.purpose}. Impact: ${entry.impact}.
+                        "${entry.type}." <em>${entry.model}</em>, ${entry.provider}, ${entry.date}. Large Language Model. Purpose: ${entry.purpose}. Impact: ${entry.impact}${integrityNote}.
                     </div>`;
                     break;
                 case 'chicago':
                     citation = `<div class="citation-entry">
-                        ${entry.provider}. "${entry.type}." <em>${entry.model}</em>. Large Language Model. Accessed ${entry.date}. Purpose: ${entry.purpose}. Impact: ${entry.impact}.
+                        ${entry.provider}. "${entry.type}." <em>${entry.model}</em>. Large Language Model. Accessed ${entry.date}. Purpose: ${entry.purpose}. Impact: ${entry.impact}${integrityNote}.
                     </div>`;
                     break;
             }
