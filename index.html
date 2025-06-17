@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI-Bib Generator</title>
+    <title>AI Bib</title>
     <style>
         * {
             margin: 0;
@@ -133,12 +133,230 @@
         /* Central Interface */
         .central-interface {
             width: 100%;
-            max-width: 750px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 0 2rem 4rem;
         }
 
-        /* Upload Box */
+        /* Upload Methods Section */
+        .upload-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .method-card {
+            background: #141414;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .method-card:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .method-card.active {
+            border-color: #2563eb;
+            background: rgba(37, 99, 235, 0.1);
+        }
+
+        .method-icon {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1rem;
+            color: #2563eb;
+        }
+
+        .method-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.5;
+        }
+
+        .method-title {
+            font-size: 1.25rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .method-description {
+            color: #999;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .method-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #2563eb;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* Smart Paste Interface */
+        .smart-paste-container {
+            background: #141414;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            display: none;
+        }
+
+        .smart-paste-container.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .paste-textarea {
+            width: 100%;
+            min-height: 300px;
+            background: #0a0a0a;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1.5rem;
+            color: #e3e3e3;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        .paste-textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .format-detector {
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            background: rgba(37, 99, 235, 0.1);
+            border-radius: 6px;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .format-detector.active {
+            display: flex;
+        }
+
+        .detector-icon {
+            width: 20px;
+            height: 20px;
+            color: #2563eb;
+        }
+
+        .detector-text {
+            font-size: 0.9rem;
+            color: #2563eb;
+        }
+
+        /* URL Input Interface */
+        .url-input-container {
+            background: #141414;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            display: none;
+        }
+
+        .url-input-container.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .url-input-group {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .url-input {
+            flex: 1;
+            background: #0a0a0a;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 0.875rem 1rem;
+            color: #e3e3e3;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .url-input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .url-input::placeholder {
+            color: #666;
+        }
+
+        .fetch-button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 0.875rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .fetch-button:hover {
+            background: #1d4ed8;
+        }
+
+        .fetch-button:disabled {
+            background: #1e1e1e;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        /* Platform Examples */
+        .platform-examples {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .platform-chip {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.375rem 0.75rem;
+            border-radius: 16px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .platform-chip:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Traditional Upload Box */
         .upload-box {
             background: #141414;
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -146,6 +364,12 @@
             padding: 2rem;
             margin-bottom: 2rem;
             transition: all 0.3s ease;
+            display: none;
+        }
+
+        .upload-box.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
         }
 
         .upload-area {
@@ -215,7 +439,6 @@
         /* File List */
         .file-list {
             margin-top: 1.5rem;
-            space-y: 0.5rem;
         }
 
         .file-item {
@@ -265,6 +488,43 @@
 
         .remove-file:hover {
             color: #ff4444;
+        }
+
+        /* Analysis Preview */
+        .analysis-preview {
+            background: rgba(37, 99, 235, 0.05);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .analysis-preview.active {
+            display: block;
+        }
+
+        .analysis-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #2563eb;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #999;
+            margin-top: 0.25rem;
         }
 
         /* Generate Button */
@@ -346,17 +606,6 @@
             margin-top: 2rem;
             display: none;
             animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         .output-header {
@@ -517,7 +766,7 @@
 <body>
     <header class="header">
         <div class="header-content">
-            <a href="#" class="logo">AI Bibliography Generator</a>
+            <a href="#" class="logo">AI Bib</a>
             <nav class="nav">
                 <a href="#features">Features</a>
                 <a href="#how-it-works">How it works</a>
@@ -534,7 +783,114 @@
         </section>
 
         <div class="central-interface">
-            <div class="upload-box">
+            <!-- Upload Methods Selection -->
+            <div class="upload-methods">
+                <div class="method-card" onclick="selectMethod('paste')">
+                    <div class="method-badge">Recommended</div>
+                    <div class="method-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                        </svg>
+                    </div>
+                    <h3 class="method-title">Smart Paste</h3>
+                    <p class="method-description">Copy your entire conversation and paste it here. We'll automatically detect the format and extract key information.</p>
+                </div>
+
+                <div class="method-card" onclick="selectMethod('url')">
+                    <div class="method-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                        </svg>
+                    </div>
+                    <h3 class="method-title">Share Link</h3>
+                    <p class="method-description">Paste a shared conversation link from ChatGPT, Claude, or other AI platforms.</p>
+                </div>
+
+                <div class="method-card" onclick="selectMethod('file')">
+                    <div class="method-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                    </div>
+                    <h3 class="method-title">File Upload</h3>
+                    <p class="method-description">Upload exported conversation files in JSON, TXT, PDF, or other formats.</p>
+                </div>
+            </div>
+
+            <!-- Smart Paste Interface -->
+            <div class="smart-paste-container" id="pasteContainer">
+                <textarea 
+                    class="paste-textarea" 
+                    id="pasteTextarea"
+                    placeholder="Paste your AI conversation here...
+
+Example:
+User: Can you help me improve my essay introduction?
+Assistant: I'd be happy to help improve your essay introduction..."
+                    oninput="detectFormat(this.value)"
+                ></textarea>
+                
+                <div class="format-detector" id="formatDetector">
+                    <svg class="detector-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 11l3 3L22 4"/>
+                        <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+                    </svg>
+                    <span class="detector-text" id="detectorText">Detected: ChatGPT conversation</span>
+                </div>
+
+                <div class="analysis-preview" id="analysisPreview">
+                    <h4 style="margin-bottom: 0.5rem;">Quick Analysis</h4>
+                    <div class="analysis-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="messageCount">0</div>
+                            <div class="stat-label">Messages</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="codeBlocks">0</div>
+                            <div class="stat-label">Code Blocks</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="editCount">0</div>
+                            <div class="stat-label">Edits Made</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- URL Input Interface -->
+            <div class="url-input-container" id="urlContainer">
+                <div class="url-input-group">
+                    <input 
+                        type="url" 
+                        class="url-input" 
+                        placeholder="https://chat.openai.com/share/..." 
+                        id="urlInput"
+                    >
+                    <button class="fetch-button" onclick="fetchConversation()">
+                        Fetch Conversation
+                    </button>
+                </div>
+                
+                <div class="platform-examples">
+                    <div class="platform-chip" onclick="setExample('chatgpt')">
+                        ChatGPT
+                    </div>
+                    <div class="platform-chip" onclick="setExample('claude')">
+                        Claude
+                    </div>
+                    <div class="platform-chip" onclick="setExample('gemini')">
+                        Gemini
+                    </div>
+                    <div class="platform-chip" onclick="setExample('perplexity')">
+                        Perplexity
+                    </div>
+                </div>
+            </div>
+
+            <!-- Traditional File Upload -->
+            <div class="upload-box" id="fileUploadBox">
                 <div class="upload-area" id="uploadArea">
                     <div class="upload-icon">
                         <svg viewBox="0 0 24 24">
@@ -613,7 +969,7 @@
     </section>
 
     <footer class="footer">
-        <p>&copy; 2024 AI Bibliography Generator. Built for academic integrity.</p>
+        <p>&copy; 2024 AI Bib. Built for academic integrity.</p>
     </footer>
 
     <div class="loading-overlay" id="loadingOverlay">
@@ -626,8 +982,147 @@
     <script>
         let uploadedFiles = [];
         let currentFormat = 'apa';
+        let selectedMethod = null;
+        let conversationData = null;
 
-        // Drag and drop functionality
+        // Method selection
+        function selectMethod(method) {
+            // Reset all cards
+            document.querySelectorAll('.method-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            // Hide all containers
+            document.getElementById('pasteContainer').classList.remove('active');
+            document.getElementById('urlContainer').classList.remove('active');
+            document.getElementById('fileUploadBox').classList.remove('active');
+            
+            // Reset button state
+            updateGenerateButton();
+            
+            // Activate selected method
+            selectedMethod = method;
+            event.currentTarget.classList.add('active');
+            
+            if (method === 'paste') {
+                document.getElementById('pasteContainer').classList.add('active');
+                document.getElementById('pasteTextarea').focus();
+            } else if (method === 'url') {
+                document.getElementById('urlContainer').classList.add('active');
+                document.getElementById('urlInput').focus();
+            } else if (method === 'file') {
+                document.getElementById('fileUploadBox').classList.add('active');
+            }
+        }
+
+        // Smart format detection
+        function detectFormat(text) {
+            if (!text || text.length < 50) {
+                document.getElementById('formatDetector').classList.remove('active');
+                document.getElementById('analysisPreview').classList.remove('active');
+                updateGenerateButton();
+                return;
+            }
+
+            const detector = document.getElementById('formatDetector');
+            const detectorText = document.getElementById('detectorText');
+            const preview = document.getElementById('analysisPreview');
+            
+            detector.classList.add('active');
+            
+            // Pattern detection
+            let detectedFormat = 'unknown';
+            if (text.includes('User:') && text.includes('Assistant:')) {
+                detectorText.textContent = 'Detected: ChatGPT conversation (95% confidence)';
+                detectedFormat = 'chatgpt';
+            } else if (text.includes('Human:') && text.includes('Assistant:')) {
+                detectorText.textContent = 'Detected: Claude conversation (98% confidence)';
+                detectedFormat = 'claude';
+            } else if (text.includes('You:') && (text.includes('ChatGPT:') || text.includes('GPT:'))) {
+                detectorText.textContent = 'Detected: ChatGPT export format';
+                detectedFormat = 'chatgpt-export';
+            } else if (text.includes('```') || text.includes('def ') || text.includes('function ')) {
+                detectorText.textContent = 'Detected: Code-heavy conversation';
+                detectedFormat = 'code-focused';
+            } else {
+                detectorText.textContent = 'Analyzing format...';
+            }
+
+            // Quick stats
+            const lines = text.split('\n');
+            const messageCount = (text.match(/(User:|Human:|Assistant:|You:|ChatGPT:)/g) || []).length;
+            const codeBlocks = (text.match(/```/g) || []).length / 2;
+            const editIndicators = (text.match(/(revised|updated|changed|modified|improved|edited|fixed)/gi) || []).length;
+            
+            document.getElementById('messageCount').textContent = messageCount;
+            document.getElementById('codeBlocks').textContent = Math.floor(codeBlocks);
+            document.getElementById('editCount').textContent = editIndicators;
+            
+            if (messageCount > 0) {
+                preview.classList.add('active');
+                conversationData = {
+                    type: 'paste',
+                    format: detectedFormat,
+                    content: text,
+                    stats: {
+                        messages: messageCount,
+                        codeBlocks: Math.floor(codeBlocks),
+                        edits: editIndicators
+                    }
+                };
+            }
+            
+            updateGenerateButton();
+        }
+
+        // URL Examples
+        function setExample(platform) {
+            const urlInput = document.getElementById('urlInput');
+            const examples = {
+                chatgpt: 'https://chat.openai.com/share/abc123...',
+                claude: 'https://claude.ai/share/xyz789...',
+                gemini: 'https://g.co/gemini/share/def456...',
+                perplexity: 'https://perplexity.ai/share/ghi012...'
+            };
+            urlInput.value = examples[platform];
+            urlInput.focus();
+        }
+
+        // Fetch conversation from URL
+        function fetchConversation() {
+            const url = document.getElementById('urlInput').value;
+            const button = event.target;
+            
+            if (!url) return;
+            
+            button.disabled = true;
+            button.textContent = 'Fetching...';
+            
+            // Simulate fetching
+            setTimeout(() => {
+                button.disabled = false;
+                button.textContent = 'Fetch Conversation';
+                
+                conversationData = {
+                    type: 'url',
+                    url: url,
+                    platform: detectPlatformFromUrl(url)
+                };
+                
+                updateGenerateButton();
+                alert('Share link processed! (In production, this would fetch and parse the conversation)');
+            }, 2000);
+        }
+
+        function detectPlatformFromUrl(url) {
+            if (url.includes('chat.openai.com')) return 'chatgpt';
+            if (url.includes('claude.ai')) return 'claude';
+            if (url.includes('gemini')) return 'gemini';
+            if (url.includes('perplexity')) return 'perplexity';
+            return 'unknown';
+        }
+
+        // Traditional file upload (keeping existing functionality)
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
         const fileList = document.getElementById('fileList');
@@ -686,7 +1181,19 @@
         }
 
         function updateGenerateButton() {
-            generateButton.disabled = uploadedFiles.length === 0;
+            let canGenerate = false;
+            
+            if (selectedMethod === 'paste') {
+                const pasteContent = document.getElementById('pasteTextarea').value;
+                canGenerate = pasteContent.length > 50;
+            } else if (selectedMethod === 'url') {
+                const urlContent = document.getElementById('urlInput').value;
+                canGenerate = urlContent.length > 10 && conversationData;
+            } else if (selectedMethod === 'file') {
+                canGenerate = uploadedFiles.length > 0;
+            }
+            
+            generateButton.disabled = !canGenerate;
         }
 
         function generateBibliography() {
@@ -704,33 +1211,55 @@
         function createBibliography() {
             const bibliographyContent = document.getElementById('bibliographyContent');
             
-            // Sample bibliography entries
-            const entries = [
-                {
-                    type: 'Literature Review',
-                    model: 'GPT-4',
-                    provider: 'OpenAI',
-                    date: new Date().toLocaleDateString(),
-                    purpose: 'Identifying relevant academic sources and refining research questions',
-                    impact: 'Suggested 15 potential sources; 8 were incorporated after independent verification'
-                },
-                {
-                    type: 'Writing Enhancement',
-                    model: 'Claude 3 Opus',
-                    provider: 'Anthropic',
-                    date: new Date().toLocaleDateString(),
-                    purpose: 'Grammar checking and clarity improvements',
-                    impact: 'Improved sentence structure in introduction and conclusion; all content remained original'
-                },
-                {
-                    type: 'Conceptual Development',
-                    model: 'ChatGPT',
-                    provider: 'OpenAI',
-                    date: new Date().toLocaleDateString(),
-                    purpose: 'Brainstorming thesis statements and argument structure',
-                    impact: 'Generated 5 thesis options; final thesis independently developed based on AI suggestions'
+            // Enhanced entries based on detected content
+            let entries = [];
+            
+            if (conversationData) {
+                // Add entries based on detected usage patterns
+                if (conversationData.stats && conversationData.stats.codeBlocks > 0) {
+                    entries.push({
+                        type: 'Code Development',
+                        model: conversationData.format === 'claude' ? 'Claude 3 Opus' : 'GPT-4',
+                        provider: conversationData.format === 'claude' ? 'Anthropic' : 'OpenAI',
+                        date: new Date().toLocaleDateString(),
+                        purpose: 'Debugging and code optimization assistance',
+                        impact: `Provided ${conversationData.stats.codeBlocks} code examples; implementation adapted and tested independently`
+                    });
                 }
-            ];
+                
+                if (conversationData.stats && conversationData.stats.edits > 0) {
+                    entries.push({
+                        type: 'Writing Enhancement',
+                        model: conversationData.format === 'claude' ? 'Claude 3 Opus' : 'GPT-4',
+                        provider: conversationData.format === 'claude' ? 'Anthropic' : 'OpenAI',
+                        date: new Date().toLocaleDateString(),
+                        purpose: 'Grammar, clarity, and structure improvements',
+                        impact: `Suggested ${conversationData.stats.edits} revisions; final content reflects original ideas with enhanced clarity`
+                    });
+                }
+            }
+            
+            // Add default entries if none detected
+            if (entries.length === 0) {
+                entries = [
+                    {
+                        type: 'Literature Review',
+                        model: 'GPT-4',
+                        provider: 'OpenAI',
+                        date: new Date().toLocaleDateString(),
+                        purpose: 'Identifying relevant academic sources and refining research questions',
+                        impact: 'Suggested 15 potential sources; 8 were incorporated after independent verification'
+                    },
+                    {
+                        type: 'Conceptual Development',
+                        model: 'Claude 3 Opus',
+                        provider: 'Anthropic',
+                        date: new Date().toLocaleDateString(),
+                        purpose: 'Brainstorming thesis statements and argument structure',
+                        impact: 'Generated 5 thesis options; final thesis independently developed based on AI suggestions'
+                    }
+                ];
+            }
 
             let html = '';
             entries.forEach((entry, index) => {
