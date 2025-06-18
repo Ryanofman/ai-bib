@@ -607,6 +607,11 @@
             to { transform: rotate(360deg); }
         }
 
+        @keyframes highlight {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; box-shadow: 0 0 20px rgba(37, 99, 235, 0.3); }
+        }
+
         .loading-text {
             color: #999;
             font-size: 1rem;
@@ -834,6 +839,250 @@
             margin-top: 6rem;
         }
 
+        /* How It Works Section */
+        .how-it-works {
+            background: #0f0f0f;
+            padding: 6rem 0;
+            margin-top: 6rem;
+        }
+
+        .section-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .section-subtitle {
+            font-size: 1.25rem;
+            color: #999;
+            text-align: center;
+            margin-bottom: 4rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .process-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 5rem;
+        }
+
+        .process-step {
+            text-align: center;
+            position: relative;
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: #2563eb;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0 auto 1.5rem;
+        }
+
+        .process-step h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+        }
+
+        .process-step p {
+            color: #999;
+            line-height: 1.6;
+        }
+
+        .completeness-section {
+            background: #141414;
+            border-radius: 12px;
+            padding: 3rem;
+            margin-top: 3rem;
+        }
+
+        .completeness-section h3 {
+            font-size: 1.75rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .check-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .check-item {
+            background: #0a0a0a;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .check-item:hover {
+            border-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .check-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .check-item h4 {
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .check-item p {
+            color: #999;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* About Section */
+        .about-section {
+            padding: 6rem 0;
+            background: #0a0a0a;
+        }
+
+        .about-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .mission-statement {
+            text-align: center;
+            margin-bottom: 4rem;
+            padding: 2rem;
+            background: #141414;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .mission-statement h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #2563eb;
+        }
+
+        .mission-statement p {
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: #e3e3e3;
+        }
+
+        .ideology-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .ideology-card {
+            background: #141414;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .ideology-card:hover {
+            border-color: rgba(37, 99, 235, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .ideology-card h4 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .ideology-card p {
+            color: #999;
+            line-height: 1.7;
+        }
+
+        .founder-note {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            border-radius: 12px;
+            padding: 3rem;
+            margin: 4rem 0;
+        }
+
+        .founder-note h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .founder-note blockquote {
+            font-style: italic;
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: #e3e3e3;
+            margin: 0;
+            padding: 0;
+            border: none;
+        }
+
+        .vision-future {
+            background: #141414;
+            border-radius: 12px;
+            padding: 3rem;
+            margin-top: 4rem;
+        }
+
+        .vision-future h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .vision-future ul {
+            list-style: none;
+            padding: 0;
+            margin: 2rem 0;
+        }
+
+        .vision-future li {
+            padding-left: 2rem;
+            margin-bottom: 1rem;
+            position: relative;
+            color: #e3e3e3;
+            line-height: 1.6;
+        }
+
+        .vision-future li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #2563eb;
+            font-weight: bold;
+        }
+
+        .vision-future > p {
+            color: #999;
+            line-height: 1.7;
+            margin-top: 1.5rem;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .upload-methods {
@@ -851,6 +1100,19 @@
             .features {
                 grid-template-columns: 1fr;
             }
+            
+            .process-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .check-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .ideology-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -862,7 +1124,7 @@
                 <a href="#features">Features</a>
                 <a href="#how-it-works">How it works</a>
                 <a href="#about">About</a>
-                <a href="#" class="nav-button">Get Started</a>
+                <a href="#upload-section" class="nav-button" onclick="scrollToUpload()">Get Started</a>
             </nav>
         </div>
     </header>
@@ -873,7 +1135,7 @@
             <p>Generate professional bibliographies that transparently show how AI enhanced your research and writing process.</p>
         </section>
 
-        <div class="central-interface">
+        <div class="central-interface" id="upload-section">
             <!-- Upload Methods Selection -->
             <div class="upload-methods">
                 <div class="method-card" onclick="selectMethod('paste')">
@@ -1056,6 +1318,138 @@ Assistant: I'd be happy to help improve your essay introduction..."
             </div>
             <h3 class="feature-title">Ethical Transparency</h3>
             <p class="feature-description">Promote responsible AI use by clearly documenting how AI enhanced rather than replaced your original thinking and research.</p>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="section-container">
+            <h2 class="section-title">How It Works</h2>
+            <p class="section-subtitle">Our advanced conversation analysis ensures accurate and complete documentation of AI assistance</p>
+            
+            <div class="process-grid">
+                <div class="process-step">
+                    <div class="step-number">1</div>
+                    <h3>Upload Your Conversation</h3>
+                    <p>Choose from three methods: paste directly, share a link, or upload a file. Our system supports all major AI platforms.</p>
+                </div>
+                
+                <div class="process-step">
+                    <div class="step-number">2</div>
+                    <h3>Intelligent Analysis</h3>
+                    <p>Our detector analyzes conversation structure, identifies usage patterns, and checks for completeness using advanced algorithms.</p>
+                </div>
+                
+                <div class="process-step">
+                    <div class="step-number">3</div>
+                    <h3>Integrity Verification</h3>
+                    <p>We check for missing context, sequence anomalies, and potential edits to ensure your documentation is complete and honest.</p>
+                </div>
+                
+                <div class="process-step">
+                    <div class="step-number">4</div>
+                    <h3>Generate Citations</h3>
+                    <p>Receive properly formatted citations in APA, MLA, or Chicago style that accurately reflect how AI contributed to your work.</p>
+                </div>
+            </div>
+
+            <div class="completeness-section">
+                <h3>How We Check for Completeness</h3>
+                <div class="check-grid">
+                    <div class="check-item">
+                        <div class="check-icon">🔍</div>
+                        <h4>Context Analysis</h4>
+                        <p>We scan for phrases like "as mentioned earlier" or "continuing from above" that might indicate missing messages.</p>
+                    </div>
+                    
+                    <div class="check-item">
+                        <div class="check-icon">🔄</div>
+                        <h4>Sequence Verification</h4>
+                        <p>Conversations should alternate between user and AI. We flag when this pattern is broken, suggesting removed content.</p>
+                    </div>
+                    
+                    <div class="check-item">
+                        <div class="check-icon">⏱️</div>
+                        <h4>Temporal Consistency</h4>
+                        <p>Time references are analyzed to ensure chronological order. Backwards timestamps indicate potential manipulation.</p>
+                    </div>
+                    
+                    <div class="check-item">
+                        <div class="check-icon">📝</div>
+                        <h4>Topic Flow</h4>
+                        <p>Sudden topic changes or responses without prompts are detected, highlighting possible omissions.</p>
+                    </div>
+                    
+                    <div class="check-item">
+                        <div class="check-icon">💻</div>
+                        <h4>Code Completeness</h4>
+                        <p>Code blocks with ellipsis or "rest of code" comments suggest incomplete documentation of AI assistance.</p>
+                    </div>
+                    
+                    <div class="check-item">
+                        <div class="check-icon">🎯</div>
+                        <h4>Integrity Score</h4>
+                        <p>All factors combine into a 0-100% score, with recommendations for how to handle potential issues in citations.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about-section" id="about">
+        <div class="section-container">
+            <h2 class="section-title">About AI Bib</h2>
+            
+            <div class="about-content">
+                <div class="mission-statement">
+                    <h3>Our Mission</h3>
+                    <p>AI Bib was created to bridge the gap between innovative AI technology and academic integrity. As AI becomes an integral part of education and research, we believe transparency isn't just ethical—it's essential for the advancement of knowledge.</p>
+                </div>
+
+                <div class="ideology-grid">
+                    <div class="ideology-card">
+                        <h4>Why This Matters</h4>
+                        <p>The rise of AI in academia has created a crisis of trust. Students fear being accused of cheating, while educators struggle to distinguish between AI assistance and original work. This tool transforms that fear into transparency, allowing students to proudly document how AI enhanced their learning journey.</p>
+                    </div>
+                    
+                    <div class="ideology-card">
+                        <h4>The Philosophy</h4>
+                        <p>We believe AI should amplify human intelligence, not replace it. Just as we cite books and articles, we should cite AI interactions. This isn't about catching cheaters—it's about celebrating the collaborative nature of modern learning and giving credit where it's due.</p>
+                    </div>
+                    
+                    <div class="ideology-card">
+                        <h4>Academic Evolution</h4>
+                        <p>Remember when calculators were banned in math class? Now they're required. AI is following the same trajectory. By providing proper documentation tools, we're helping academia evolve to embrace AI as a legitimate research tool rather than a threat.</p>
+                    </div>
+                    
+                    <div class="ideology-card">
+                        <h4>Empowering Students</h4>
+                        <p>Students shouldn't have to choose between using helpful technology and maintaining academic integrity. AI Bib empowers them to use AI confidently, knowing they can properly document their process and demonstrate their own critical thinking.</p>
+                    </div>
+                </div>
+
+                <div class="founder-note">
+                    <h3>A Note from the Creator</h3>
+                    <blockquote>
+                        "I built AI Bib because I saw brilliant students paralyzed by fear—afraid to use AI tools that could enhance their learning, worried about accusations of academic dishonesty. This isn't just a citation generator; it's a movement toward honest, transparent collaboration between humans and AI.
+                        <br><br>
+                        Every conversation with AI is a learning opportunity. By documenting these interactions, we're not admitting weakness—we're demonstrating intellectual curiosity and methodological rigor. The future of education includes AI, and that future should be built on transparency, not suspicion."
+                    </blockquote>
+                </div>
+
+                <div class="vision-future">
+                    <h3>The Future We're Building</h3>
+                    <p>Imagine a world where:</p>
+                    <ul>
+                        <li>Students confidently use AI as a learning partner, fully documenting their process</li>
+                        <li>Professors see AI citations as a sign of thorough research, not cheating</li>
+                        <li>Academic institutions have clear guidelines for AI use, supported by proper documentation tools</li>
+                        <li>The focus shifts from "did you use AI?" to "how did AI enhance your understanding?"</li>
+                    </ul>
+                    <p>This is the future AI Bib is helping to create—one citation at a time.</p>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -1486,6 +1880,20 @@ Assistant: I'd be happy to help improve your essay introduction..."
                 }
             });
         });
+
+        // Scroll to upload section
+        function scrollToUpload() {
+            event.preventDefault();
+            const uploadSection = document.getElementById('upload-section');
+            if (uploadSection) {
+                uploadSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Add a subtle highlight effect
+                uploadSection.style.animation = 'highlight 2s ease';
+                setTimeout(() => {
+                    uploadSection.style.animation = '';
+                }, 2000);
+            }
+        }
     </script>
 </body>
 </html>
