@@ -141,12 +141,18 @@
         /* Upload Methods Section */
         .upload-methods {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 1.5rem;
             margin-bottom: 2rem;
             max-width: 900px;
             margin-left: auto;
             margin-right: auto;
+        }
+
+        .upload-methods .method-card:last-child {
+            grid-column: 1 / -1;
+            max-width: 435px;
+            margin: 0 auto;
         }
 
         .method-card {
@@ -158,6 +164,11 @@
             cursor: pointer;
             position: relative;
             overflow: hidden;
+            user-select: none;
+        }
+
+        .method-card * {
+            pointer-events: none;
         }
 
         .method-card:hover {
@@ -429,6 +440,7 @@
             transition: all 0.2s;
             margin-top: 1rem;
             font-weight: 400;
+            pointer-events: auto;
         }
 
         .upload-button:hover {
@@ -821,6 +833,25 @@
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             margin-top: 6rem;
         }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .upload-methods {
+                grid-template-columns: 1fr;
+            }
+            
+            .upload-methods .method-card:last-child {
+                max-width: 100%;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -961,7 +992,7 @@ Assistant: I'd be happy to help improve your essay introduction..."
                     </div>
                     <p class="upload-text">Drop your AI conversation files here</p>
                     <input type="file" id="fileInput" class="file-input" multiple accept=".txt,.json,.pdf,.docx,.csv">
-                    <button class="upload-button" onclick="document.getElementById('fileInput').click()">
+                    <button class="upload-button" onclick="event.stopPropagation(); document.getElementById('fileInput').click()">
                         Choose Files
                     </button>
                 </div>
@@ -1045,7 +1076,15 @@ Assistant: I'd be happy to help improve your essay introduction..."
         let currentFormat = 'apa';
         let selectedMethod = null;
         let conversationData = null;
-        const detector = new ConversationDetector();
+        let detector = null;
+        
+        // Wait for DOM to load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize detector if available
+            if (window.ConversationDetector) {
+                detector = new ConversationDetector();
+            }
+        });
 
         // Method selection
         function selectMethod(method) {
@@ -1062,9 +1101,12 @@ Assistant: I'd be happy to help improve your essay introduction..."
             // Reset button state
             updateGenerateButton();
             
+            // Find the clicked card
+            const clickedCard = event.currentTarget;
+            
             // Activate selected method
             selectedMethod = method;
-            event.currentTarget.classList.add('active');
+            clickedCard.classList.add('active');
             
             if (method === 'paste') {
                 document.getElementById('pasteContainer').classList.add('active');
@@ -1093,30 +1135,37 @@ Assistant: I'd be happy to help improve your essay introduction..."
             detector.classList.add('active');
             
             // Use the conversation detector for analysis
-            const analysis = window.detector.analyzeIntegrity(text);
+            const analysis = detector ? detector.analyzeIntegrity(text) : null;
             
-            // Update detector text based on analysis
-            if (analysis.format !== 'unknown') {
-                const platformName = analysis.format.charAt(0).toUpperCase() + analysis.format.slice(1);
-                detectorText.textContent = `Detected: ${platformName} conversation (${analysis.score}% integrity)`;
-                
-                // Add warning color if integrity is low
-                if (analysis.integrityLevel === 'low' || analysis.integrityLevel === 'very_low') {
-                    detector.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
-                    detectorText.style.color = '#ef4444';
-                } else if (analysis.integrityLevel === 'medium') {
-                    detector.style.backgroundColor = 'rgba(245, 158, 11, 0.1)';
-                    detectorText.style.color = '#f59e0b';
+            if (analysis) {
+                // Update detector text based on analysis
+                if (analysis.format !== 'unknown') {
+                    const platformName = analysis.format.charAt(0).toUpperCase() + analysis.format.slice(1);
+                    detectorText.textContent = `Detected: ${platformName} conversation (${analysis.score}% integrity)`;
+                    
+                    // Add warning color if integrity is low
+                    if (analysis.integrityLevel === 'low' || analysis.integrityLevel === 'very_low') {
+                        detector.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                        detectorText.style.color = '#ef4444';
+                    } else if (analysis.integrityLevel === 'medium') {
+                        detector.style.backgroundColor = 'rgba(245, 158, 11, 0.1)';
+                        detectorText.style.color = '#f59e0b';
+                    } else {
+                        detector.style.backgroundColor = 'rgba(37, 99, 235, 0.1)';
+                        detectorText.style.color = '#2563eb';
+                    }
                 } else {
-                    detector.style.backgroundColor = 'rgba(37, 99, 235, 0.1)';
-                    detectorText.style.color = '#2563eb';
+                    detectorText.textContent = 'Analyzing format...';
                 }
+                
+                // Update stats
+                document.getElementById('messageCount').textContent = analysis.statistics.totalMessages || 0;
             } else {
-                detectorText.textContent = 'Analyzing format...';
+                // Fallback if detector not loaded
+                detectorText.textContent = 'Format detected';
+                const messageCount = (text.match(/(User:|Human:|Assistant:|You:|ChatGPT:)/g) || []).length;
+                document.getElementById('messageCount').textContent = messageCount;
             }
-
-            // Update stats
-            document.getElementById('messageCount').textContent = analysis.statistics.totalMessages || 0;
             const codeBlocks = (text.match(/```/g) || []).length / 2;
             document.getElementById('codeBlocks').textContent = Math.floor(codeBlocks);
             const editIndicators = (text.match(/(revised|updated|changed|modified|improved|edited|fixed)/gi) || []).length;
@@ -1125,8 +1174,8 @@ Assistant: I'd be happy to help improve your essay introduction..."
             preview.classList.add('active');
             
             // Show integrity report if issues found
-            if (analysis.score < 90) {
-                const reportHtml = window.detector.generateReport(analysis);
+            if (analysis && analysis.score < 90) {
+                const reportHtml = detector.generateReport(analysis);
                 const existingReport = document.getElementById('integrityReport');
                 
                 if (existingReport) {
@@ -1146,11 +1195,11 @@ Assistant: I'd be happy to help improve your essay introduction..."
             
             conversationData = {
                 type: 'paste',
-                format: analysis.format,
+                format: analysis ? analysis.format : 'unknown',
                 content: text,
                 analysis: analysis,
                 stats: {
-                    messages: analysis.statistics.totalMessages || 0,
+                    messages: analysis ? (analysis.statistics.totalMessages || 0) : 0,
                     codeBlocks: Math.floor(codeBlocks),
                     edits: editIndicators
                 }
@@ -1206,30 +1255,34 @@ Assistant: I'd be happy to help improve your essay introduction..."
             return 'unknown';
         }
 
-        // Traditional file upload (keeping existing functionality)
+        // Drag and drop functionality
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
         const fileList = document.getElementById('fileList');
         const generateButton = document.getElementById('generateButton');
 
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.classList.add('drag-over');
-        });
+        if (uploadArea) {
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('drag-over');
+            });
 
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.classList.remove('drag-over');
-        });
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('drag-over');
+            });
 
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('drag-over');
-            handleFiles(e.dataTransfer.files);
-        });
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('drag-over');
+                handleFiles(e.dataTransfer.files);
+            });
+        }
 
-        fileInput.addEventListener('change', (e) => {
-            handleFiles(e.target.files);
-        });
+        if (fileInput) {
+            fileInput.addEventListener('change', (e) => {
+                handleFiles(e.target.files);
+            });
+        }
 
         function handleFiles(files) {
             for (let file of files) {
@@ -1265,6 +1318,9 @@ Assistant: I'd be happy to help improve your essay introduction..."
         }
 
         function updateGenerateButton() {
+            const generateButton = document.getElementById('generateButton');
+            if (!generateButton) return;
+            
             let canGenerate = false;
             
             if (selectedMethod === 'paste') {
