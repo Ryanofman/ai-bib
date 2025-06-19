@@ -356,6 +356,81 @@
             cursor: not-allowed;
         }
 
+        /* Fetch Status Messages */
+        .fetch-status {
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .fetch-status.success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #86efac;
+        }
+
+        .fetch-status.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+
+        .fetch-status.info {
+            background: rgba(37, 99, 235, 0.1);
+            border: 1px solid rgba(37, 99, 235, 0.3);
+            color: #93bbfe;
+        }
+
+        /* URL Preview */
+        .url-preview {
+            background: rgba(37, 99, 235, 0.05);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            display: none;
+        }
+
+        .url-preview-content h4 {
+            color: #60a5fa;
+            margin-bottom: 1rem;
+            font-size: 1.125rem;
+        }
+
+        .preview-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .preview-stats .stat {
+            text-align: center;
+        }
+
+        .preview-stats .stat-value {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2563eb;
+        }
+
+        .preview-stats .stat-label {
+            display: block;
+            font-size: 0.75rem;
+            color: #999;
+            text-transform: uppercase;
+            margin-top: 0.25rem;
+        }
+
+        .preview-title, .preview-model {
+            font-size: 0.875rem;
+            color: #999;
+            margin: 0.25rem 0;
+        }
+
         /* Platform Examples */
         .platform-examples {
             margin-top: 1rem;
@@ -1604,6 +1679,7 @@ Assistant: I'd be happy to help improve your essay introduction..."
 
     <script src="conversation-detector.js"></script>
     <script src="ai-impact-analyzer.js"></script>
+    <script src="conversation-fetcher.js"></script>
     <script>
         let uploadedFiles = [];
         let currentFormat = 'apa';
@@ -1611,6 +1687,7 @@ Assistant: I'd be happy to help improve your essay introduction..."
         let conversationData = null;
         let detector = null;
         let impactAnalyzer = null;
+        let conversationFetcher = null;
         
         // Wait for DOM to load
         document.addEventListener('DOMContentLoaded', function() {
@@ -1621,6 +1698,10 @@ Assistant: I'd be happy to help improve your essay introduction..."
             // Initialize impact analyzer
             if (window.AIImpactAnalyzer) {
                 impactAnalyzer = new AIImpactAnalyzer();
+            }
+            // Initialize conversation fetcher
+            if (window.ConversationFetcher) {
+                conversationFetcher = new ConversationFetcher();
             }
         });
 
@@ -1760,7 +1841,7 @@ Assistant: I'd be happy to help improve your essay introduction..."
         }
 
         // Fetch conversation from URL
-        function fetchConversation() {
+        async function fetchConversation() {
             const url = document.getElementById('urlInput').value;
             const button = event.target;
             
@@ -1769,20 +1850,132 @@ Assistant: I'd be happy to help improve your essay introduction..."
             button.disabled = true;
             button.textContent = 'Fetching...';
             
-            // Simulate fetching
-            setTimeout(() => {
+            try {
+                if (conversationFetcher) {
+                    // Attempt to fetch the actual conversation
+                    const result = await conversationFetcher.fetchConversation(url);
+                    
+                    if (result.success) {
+                        // Process the fetched conversation
+                        const conversationText = result.data.text;
+                        
+                        // Run integrity check
+                        const integrityAnalysis = detector ? 
+                            detector.analyzeIntegrity(conversationText) : null;
+                        
+                        // Run impact analysis
+                        const impactAnalysis = impactAnalyzer ? 
+                            impactAnalyzer.analyzeConversation(conversationText, {
+                                format: result.data.platform,
+                                metadata: result.data.metadata
+                            }) : null;
+                        
+                        conversationData = {
+                            type: 'url',
+                            url: url,
+                            platform: result.data.platform,
+                            content: conversationText,
+                            originalData: result.data,
+                            integrityAnalysis: integrityAnalysis,
+                            impactAnalysis: impactAnalysis
+                        };
+                        
+                        // Show success message
+                        showFetchStatus('success', `Successfully fetched ${result.data.messages.length} messages from ${result.data.platform}`);
+                        
+                        // Update preview
+                        updateUrlPreview(result.data, impactAnalysis);
+                        
+                    } else {
+                        // Show error and suggestion
+                        showFetchStatus('error', result.error);
+                        
+                        // Fallback to manual entry
+                        if (result.suggestion) {
+                            showFetchStatus('info', result.suggestion);
+                        }
+                    }
+                } else {
+                    // Fallback if fetcher not loaded
+                    showFetchStatus('error', 'Fetcher not available. Please copy and paste your conversation.');
+                }
+                
+            } catch (error) {
+                console.error('Fetch error:', error);
+                showFetchStatus('error', 'Unable to fetch conversation. Please try copying and pasting instead.');
+            } finally {
                 button.disabled = false;
                 button.textContent = 'Fetch Conversation';
-                
-                conversationData = {
-                    type: 'url',
-                    url: url,
-                    platform: detectPlatformFromUrl(url)
-                };
-                
                 updateGenerateButton();
-                alert('Share link processed! (In production, this would fetch and parse the conversation)');
-            }, 2000);
+            }
+        }
+
+        function showFetchStatus(type, message) {
+            const statusDiv = document.getElementById('fetchStatus') || createStatusDiv();
+            statusDiv.className = `fetch-status ${type}`;
+            statusDiv.textContent = message;
+            statusDiv.style.display = 'block';
+            
+            // Auto-hide success messages
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        function createStatusDiv() {
+            const div = document.createElement('div');
+            div.id = 'fetchStatus';
+            const urlContainer = document.getElementById('urlContainer');
+            urlContainer.appendChild(div);
+            return div;
+        }
+
+        function updateUrlPreview(conversationData, impactAnalysis) {
+            const previewDiv = document.getElementById('urlPreview') || createPreviewDiv();
+            
+            let html = `
+                <div class="url-preview-content">
+                    <h4>Fetched Conversation</h4>
+                    <div class="preview-stats">
+                        <div class="stat">
+                            <span class="stat-value">${conversationData.messages.length}</span>
+                            <span class="stat-label">Messages</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value">${conversationData.platform}</span>
+                            <span class="stat-label">Platform</span>
+                        </div>
+            `;
+            
+            if (impactAnalysis) {
+                html += `
+                        <div class="stat">
+                            <span class="stat-value">${impactAnalysis.impactCategory.percentage}%</span>
+                            <span class="stat-label">AI Impact</span>
+                        </div>
+                `;
+            }
+            
+            html += `
+                    </div>
+                    <p class="preview-title">Title: ${conversationData.title}</p>
+                    <p class="preview-model">Model: ${conversationData.model}</p>
+                </div>
+            `;
+            
+            previewDiv.innerHTML = html;
+            previewDiv.style.display = 'block';
+        }
+
+        function createPreviewDiv() {
+            const div = document.createElement('div');
+            div.id = 'urlPreview';
+            div.className = 'url-preview';
+            const urlContainer = document.getElementById('urlContainer');
+            urlContainer.appendChild(div);
+            return div;
         }
 
         function detectPlatformFromUrl(url) {
