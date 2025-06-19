@@ -1,4 +1,13 @@
-<!DOCTYPE html>
+        /* Bibliography Content */
+        .bibliography-content {
+            background: #0a0a0a;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 2rem;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            line-height: 2;
+            color: #e3e3e3;
+        <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -680,6 +689,135 @@
             font-family: 'Georgia', 'Times New Roman', serif;
             line-height: 2;
             color: #e3e3e3;
+        }
+
+        /* Impact Analysis Styles */
+        .impact-warning {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .impact-warning h4 {
+            color: #ef4444;
+            margin-bottom: 0.5rem;
+            font-size: 1.25rem;
+        }
+
+        .impact-warning p {
+            color: #fca5a5;
+            margin-bottom: 0.5rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 0.95rem;
+        }
+
+        .impact-summary {
+            background: rgba(37, 99, 235, 0.05);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .impact-summary h4 {
+            color: #60a5fa;
+            margin-bottom: 1rem;
+            font-size: 1.125rem;
+        }
+
+        .impact-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1.5rem;
+            text-align: center;
+        }
+
+        .metric {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #2563eb;
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .citations-section {
+            margin-bottom: 2rem;
+        }
+
+        .examples-section, .ethical-section {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .examples-section h5, .ethical-section h5 {
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            color: #e3e3e3;
+        }
+
+        .examples-section ul, .ethical-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .examples-section li, .ethical-section li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        .examples-section li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #2563eb;
+        }
+
+        .ethical-section li:before {
+            content: "!";
+            position: absolute;
+            left: 0;
+            width: 1rem;
+            height: 1rem;
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .concern-high {
+            color: #fca5a5 !important;
+        }
+
+        .concern-medium {
+            color: #fde047 !important;
+        }
+
+        .concern-low {
+            color: #86efac !important;
         }
 
         .citation-entry {
@@ -1465,18 +1603,24 @@ Assistant: I'd be happy to help improve your essay introduction..."
     </div>
 
     <script src="conversation-detector.js"></script>
+    <script src="ai-impact-analyzer.js"></script>
     <script>
         let uploadedFiles = [];
         let currentFormat = 'apa';
         let selectedMethod = null;
         let conversationData = null;
         let detector = null;
+        let impactAnalyzer = null;
         
         // Wait for DOM to load
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize detector if available
             if (window.ConversationDetector) {
                 detector = new ConversationDetector();
+            }
+            // Initialize impact analyzer
+            if (window.AIImpactAnalyzer) {
+                impactAnalyzer = new AIImpactAnalyzer();
             }
         });
 
@@ -1745,65 +1889,101 @@ Assistant: I'd be happy to help improve your essay introduction..."
         function createBibliography() {
             const bibliographyContent = document.getElementById('bibliographyContent');
             
-            // Enhanced entries based on detected content
-            let entries = [];
-            
-            if (conversationData) {
-                // Add integrity notice if needed
-                let integrityNote = '';
-                if (conversationData.analysis && conversationData.analysis.score < 90) {
-                    integrityNote = ` [Note: Conversation may contain edits or omissions. Integrity score: ${conversationData.analysis.score}%]`;
-                }
-                
-                // Add entries based on detected usage patterns
-                if (conversationData.stats && conversationData.stats.codeBlocks > 0) {
-                    entries.push({
-                        type: 'Code Development',
-                        model: conversationData.format === 'claude' ? 'Claude 3 Opus' : 'GPT-4',
-                        provider: conversationData.format === 'claude' ? 'Anthropic' : 'OpenAI',
-                        date: new Date().toLocaleDateString(),
-                        purpose: 'Debugging and code optimization assistance',
-                        impact: `Provided ${conversationData.stats.codeBlocks} code examples; implementation adapted and tested independently`,
-                        integrityNote: integrityNote
-                    });
-                }
-                
-                if (conversationData.stats && conversationData.stats.edits > 0) {
-                    entries.push({
-                        type: 'Writing Enhancement',
-                        model: conversationData.format === 'claude' ? 'Claude 3 Opus' : 'GPT-4',
-                        provider: conversationData.format === 'claude' ? 'Anthropic' : 'OpenAI',
-                        date: new Date().toLocaleDateString(),
-                        purpose: 'Grammar, clarity, and structure improvements',
-                        impact: `Suggested ${conversationData.stats.edits} revisions; final content reflects original ideas with enhanced clarity`,
-                        integrityNote: integrityNote
-                    });
-                }
+            if (!conversationData || !conversationData.content) {
+                // Fallback to default entries
+                createDefaultBibliography();
+                return;
             }
-            
-            // Add default entries if none detected
-            if (entries.length === 0) {
-                entries = [
-                    {
-                        type: 'Literature Review',
-                        model: 'GPT-4',
-                        provider: 'OpenAI',
-                        date: new Date().toLocaleDateString(),
-                        purpose: 'Identifying relevant academic sources and refining research questions',
-                        impact: 'Suggested 15 potential sources; 8 were incorporated after independent verification',
-                        integrityNote: ''
-                    },
-                    {
-                        type: 'Conceptual Development',
-                        model: 'Claude 3 Opus',
-                        provider: 'Anthropic',
-                        date: new Date().toLocaleDateString(),
-                        purpose: 'Brainstorming thesis statements and argument structure',
-                        impact: 'Generated 5 thesis options; final thesis independently developed based on AI suggestions',
-                        integrityNote: ''
-                    }
-                ];
+
+            // Perform comprehensive impact analysis
+            const impactAnalysis = impactAnalyzer ? 
+                impactAnalyzer.analyzeConversation(conversationData.content, {
+                    format: conversationData.format,
+                    analysis: conversationData.analysis
+                }) : null;
+
+            if (!impactAnalysis) {
+                createDefaultBibliography();
+                return;
             }
+
+            // Generate dynamic bibliography based on analysis
+            let html = '';
+            
+            // Add warning if AI was primary author
+            if (impactAnalysis.impactCategory.warning) {
+                html += `<div class="impact-warning">
+                    <h4>⚠️ High AI Impact Detected (${impactAnalysis.impactCategory.percentage}%)</h4>
+                    <p>${impactAnalysis.impactCategory.description}</p>
+                    <p>Please ensure this work reflects your own understanding and critical thinking.</p>
+                </div>`;
+            }
+
+            // Add impact summary
+            html += `<div class="impact-summary">
+                <h4>AI Impact Analysis</h4>
+                <div class="impact-metrics">
+                    <div class="metric">
+                        <span class="metric-value">${impactAnalysis.impactCategory.percentage}%</span>
+                        <span class="metric-label">Overall Impact</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">${impactAnalysis.summary.aiGeneratedWords}</span>
+                        <span class="metric-label">AI Words</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">${impactAnalysis.tasks.length}</span>
+                        <span class="metric-label">Tasks Completed</span>
+                    </div>
+                </div>
+            </div>`;
+
+            // Generate citations based on recommendations
+            html += '<div class="citations-section">';
+            
+            impactAnalysis.citationRecommendations.forEach((rec, index) => {
+                const citation = rec.citation[currentFormat] || rec.citation.apa;
+                html += `<div class="citation-entry">
+                    ${citation}
+                </div>`;
+            });
+
+            // Add specific examples if significant
+            if (impactAnalysis.specificExamples.length > 0) {
+                html += '<div class="examples-section"><h5>Specific AI Contributions:</h5><ul>';
+                impactAnalysis.specificExamples.slice(0, 5).forEach(example => {
+                    html += `<li>${example.type}: ${example.wordCount} words generated</li>`;
+                });
+                html += '</ul></div>';
+            }
+
+            // Add ethical concerns if any
+            if (impactAnalysis.ethicalConcerns.length > 0) {
+                html += '<div class="ethical-section"><h5>Important Considerations:</h5><ul>';
+                impactAnalysis.ethicalConcerns.forEach(concern => {
+                    html += `<li class="concern-${concern.level}">${concern.recommendation}</li>`;
+                });
+                html += '</ul></div>';
+            }
+
+            html += '</div>';
+
+            bibliographyContent.innerHTML = html;
+        }
+
+        function createDefaultBibliography() {
+            const bibliographyContent = document.getElementById('bibliographyContent');
+            
+            const entries = [
+                {
+                    type: 'General Assistance',
+                    model: 'AI Assistant',
+                    provider: 'Technology Provider',
+                    date: new Date().toLocaleDateString(),
+                    purpose: 'Research and writing support',
+                    impact: 'Collaborative assistance in developing ideas and content'
+                }
+            ];
 
             let html = '';
             entries.forEach((entry, index) => {
@@ -1814,6 +1994,12 @@ Assistant: I'd be happy to help improve your essay introduction..."
         }
 
         function formatEntry(entry, format) {
+            // Handle new format from AIImpactAnalyzer
+            if (typeof entry === 'string') {
+                return `<div class="citation-entry">${entry}</div>`;
+            }
+            
+            // Legacy format
             let citation = '';
             const integrityNote = entry.integrityNote || '';
             
